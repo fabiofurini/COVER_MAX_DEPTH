@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 
 
 	int algo;
-	int elle;
+	double elle;
 
 	data KP_instance;
 
@@ -59,7 +59,7 @@ int main(int argc, char** argv)
 		R=atoi(argv[4]);
 		seed=atoi(argv[5]);
 		algo=atoi(argv[6]);
-		elle=atoi(argv[7]);
+		elle=atof(argv[7]);
 
 		srand(seed);
 
