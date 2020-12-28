@@ -22,11 +22,11 @@ using namespace std;
 
 
 /*****************************************************************************/
-double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double* p, int * w,double *sol,int max_i,double elle,double constant);
+double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double* p, int * w,double *sol,int max_i,double elle,double constant,vector < int > order);
 /*****************************************************************************/
 
 /*****************************************************************************/
-void Load_SOLUTION(double *sol,int C, int n, int i_star,bool ***UU, int * w);
+void Load_SOLUTION(double *sol,int C, int n, int i_star,bool ***UU, int * w,vector < int > order);
 /*****************************************************************************/
 
 /*****************************************************************************/

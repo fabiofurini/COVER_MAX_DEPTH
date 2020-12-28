@@ -11,13 +11,14 @@
 #define TOLL_DP 0.000001
 
 /*****************************************************************************/
-void Load_SOLUTION(double *sol,int C, int n, int i_star,bool ***UU, int * w)
+void Load_SOLUTION(double *sol,int C, int n, int i_star,bool ***UU, int * w,vector < int > order)
 /*****************************************************************************/
 {
 
 	int c=C;
-	for (int jjj = n-1; jjj >= 0; jjj--)
+	for (int jjjj = n-1; jjjj >= 0; jjjj--)
 	{
+		int jjj=order[jjjj];
 
 		if(i_star==0)
 		{
@@ -45,7 +46,7 @@ void Load_SOLUTION(double *sol,int C, int n, int i_star,bool ***UU, int * w)
 }
 
 /*****************************************************************************/
-double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double * p, int * w,double *sol,int max_i,double elle,double constant)
+double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double * p, int * w,double *sol,int max_i,double elle,double constant,vector < int > order)
 /*****************************************************************************/
 {
 
@@ -68,23 +69,25 @@ double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double * p, int * w,double *sol
 	}
 	///////////////////////////////////////////////////////////////////////////////////////////
 
-
 	/////////////////////////////////////////////////////////////////////////////////////////
+
+	int item=order[0];
+
 	//INIT
 	for(int i = 0; i <= max_i; i++)
 	{
 		for(int s = 0; s <= C; s++)
 		{
 
-			UU[0][s][i]=0;
+			UU[item][s][i]=0;
 
 			if(i==1)
 			{
-				if(w[0]<=s)
+				if(w[item]<=s)
 				{
-					LOOK_UP[s][i]=p[0]+constant;
+					LOOK_UP[s][i]=p[item]+constant;
 
-					UU[0][s][i]=1;
+					UU[item][s][i]=1;
 				}
 				else
 				{
@@ -103,12 +106,15 @@ double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double * p, int * w,double *sol
 
 	///////////////////////////////////////////////////////////////////////////////////////////////////
 	//for each item
-	for (int j = 1; j < n; j++)
+	for (int jjj = 1; jjj < n; jjj++)
 	{
+
+		int j=order[jjj];
+
 		//cout << "ITEM\n" << j << endl;
 
 		//for each value of cardinality
-		for(int i = min(max_i,j+1); i >= 1; i--)
+		for(int i = min(max_i,jjj+1); i >= 1; i--)
 		{
 
 			//CARDINALITY 1
@@ -172,7 +178,9 @@ double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double * p, int * w,double *sol
 
 		if(LOOK_UP[C][i]<=TOLL_DP){continue;}
 
-		double val=pow(pow(LOOK_UP[C][i],elle)/(double)(n-i),1.0/elle);
+		double val=pow ( pow ( LOOK_UP[C][i] , elle ) / (double)( n - i ) , 1.0 / elle );
+
+		//double val= ( pow ( LOOK_UP[C][i] , elle ) / (double)( n - i ) );
 
 
 		if ( val  > opt_val + TOLL_DP)
@@ -183,19 +191,19 @@ double DP_kp_RATIO_POWER_FOR_COVER(int n, int C, double * p, int * w,double *sol
 	}
 	if(i_star==-1)
 	{
-		cout << "ALL NEGATIVE....";
+		//cout << "ALL NEGATIVE....";
 
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 		for(int j = 0; j < n; j++){for(int s = 0; s <= C; s++){delete[]UU[j][s];}delete[]UU[j];}delete[]UU;
 		for(int s = 0; s <= C; s++){delete[]LOOK_UP[s];}delete[]LOOK_UP;
 		////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-		return -1;
+		return -1000;
 	}
 
 
 	//////////////////////////////////////
-	Load_SOLUTION(sol,C,n,i_star,UU, w);
+	Load_SOLUTION(sol,C,n,i_star,UU, w,order);
 	//////////////////////////////////////
 
 

@@ -3,6 +3,57 @@
 #include "global_functions_COVER.h"
 
 
+/***********************************************************************************/
+int compare(const void *p, const void *q)
+/***********************************************************************************/
+{
+	//SORT BY NON INCREASING SCORES
+	double l = ((struct valuesSTR *)p)->score;
+	double r = ((struct valuesSTR *)q)->score;
+	return ((l < r)  ? 1:-1);
+}
+
+/******************************************/
+int extend_cover(int cover_size,int cap,double *cover,int *weight)
+/******************************************/
+{
+
+	//	for (int i = 0; i < cover_size; i++)
+	//	{
+	//		cout << cover[i] << "\t weight \t" <<weight[i] << endl;
+	//	}
+	//	cout << endl;
+
+	int lifted_items=0;
+
+	int max_weight=0;
+	for (int i = 0; i < cover_size; i++)
+	{
+		if(max_weight<weight[i] && cover[i]>0.5)
+		{
+			max_weight=weight[i];
+		}
+	}
+
+	//	cout << "max_weight\t" << max_weight << endl;
+
+	for (int i = 0; i < cover_size; i++)
+	{
+		if(cover[i]<0.5 && weight[i] >= max_weight)
+		{
+			cover[i]=1.0;
+			lifted_items++;
+
+			//			cout << "lifted->\t" << i << endl;
+		}
+	}
+
+	//	cin.get();
+
+	return lifted_items;
+
+}
+
 /******************************************/
 int make_maximal(int cover_size,int cap_sep,double *cover,int *weight_sep,double *profit_sep)
 /******************************************/
@@ -85,7 +136,7 @@ int compute_max_i(int *weights,int size,int cap_sep)
 }
 
 /***********************************************************************************/
-void  COVER_DATA_init(data_COVER *COVER_instance,int cover_size,int *weights, int capacity)
+void  COVER_DATA_init(data_COVER *COVER_instance,int cover_size,double *profits,int *weights, int capacity,int shuffle)
 /***********************************************************************************/
 {
 
@@ -100,8 +151,109 @@ void  COVER_DATA_init(data_COVER *COVER_instance,int cover_size,int *weights, in
 	{
 		COVER_instance->magic_sum[i]=0;
 
-		COVER_instance->order_DP.push_back(i);
 	}
+
+	if(shuffle==1)
+	{
+		for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+		{
+			COVER_instance->order_DP.push_back(jj);
+		}
+	}
+
+	if(shuffle==2)
+	{
+
+		cout << "\n->NON-increasing weight";
+
+		valuesSTR *values_all=new valuesSTR[COVER_instance->cover_size];
+
+		for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+		{
+
+			values_all[jj].item=jj;
+			values_all[jj].score=weights[jj];
+		}
+
+		qsort (values_all,COVER_instance->cover_size, sizeof(valuesSTR), compare);
+
+		for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+		{
+
+			//cout << "item\t" << values_all[jj].item << "\t" << values_all[jj].score << endl;
+
+			COVER_instance->order_DP.push_back(values_all[jj].item);
+		}
+
+		delete []values_all;
+
+	}
+
+
+	if(shuffle==3)
+	{
+		cout << "\n->NON-decreasing weight";
+
+		valuesSTR *values_all=new valuesSTR[COVER_instance->cover_size];
+
+		for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+		{
+
+			values_all[jj].item=jj;
+			values_all[jj].score=1.0/weights[jj];
+		}
+
+		qsort (values_all,COVER_instance->cover_size, sizeof(valuesSTR), compare);
+
+		for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+		{
+
+			//cout << "item\t" << values_all[jj].item << "\t" << values_all[jj].score << endl;
+
+			COVER_instance->order_DP.push_back(values_all[jj].item);
+		}
+
+		delete []values_all;
+
+	}
+
+
+	if(shuffle==4)
+	{
+
+		cout << "\n->PROFIT OVER WEIGTH RATIO";
+
+		valuesSTR *values_all=new valuesSTR[COVER_instance->cover_size];
+
+		for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+		{
+
+			values_all[jj].item=jj;
+			values_all[jj].score=profits[jj]/weights[jj];
+		}
+
+		qsort (values_all,COVER_instance->cover_size, sizeof(valuesSTR), compare);
+
+		for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+		{
+
+			//cout << "item\t" << values_all[jj].item << "\t" << values_all[jj].score << endl;
+
+			COVER_instance->order_DP.push_back(values_all[jj].item);
+		}
+
+		delete []values_all;
+
+	}
+
+	cout <<"\n\n************************************************************************************\n";
+	cout << "***ORDER DP***\n";
+	for (int jj = 0; jj < COVER_instance->cover_size; jj++)
+	{
+		cout <<COVER_instance->order_DP[jj] << " ";
+	}
+	cout <<"\n************************************************************************************\n\n";
+
 
 	COVER_instance->point=(double*) calloc(COVER_instance->cover_size,sizeof(double));
 	COVER_instance->profit_sep=(double*) calloc(COVER_instance->cover_size,sizeof(double));

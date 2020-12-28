@@ -24,6 +24,15 @@
 #include "global_variables_COVER.h"
 #include "DP.h"
 
+struct valuesSTR
+{
+	int item;
+	double score;
+};
+
+/***********************************************************************************/
+int extend_cover(int cover_size,int cap,double *cover,int *weight);
+/***********************************************************************************/
 
 /***********************************************************************************/
 int make_maximal(int cover_size,int cap_sep,double *cover,int *weight_sep,double *profit_sep);
@@ -46,7 +55,7 @@ void  COVER_DATA_free(data_COVER *COVER_instance);
 /***********************************************************************************/
 
 /***********************************************************************************/
-void  COVER_DATA_init(data_COVER *COVER_instance,int cover_size,int *weights, int capacity);
+void  COVER_DATA_init(data_COVER *COVER_instance,int cover_size,double *profits,int *weights, int capacity,int shuffle);
 /***********************************************************************************/
 
 /***********************************************************************************/

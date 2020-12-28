@@ -3,6 +3,8 @@
 #include "global_functions_KP.h"
 
 #define print_ist_features
+//#define print_ist_features_CONFLICTS
+
 
 
 // return a integer random value in range min-max
@@ -106,7 +108,7 @@ void read_instance_file_KP(data *KP_instance)
 
 
 /*********************************/
-void generate_instance_KP(data *KP_instance,int number_of_items,int perc_cap,int category,int R)
+int generate_instance_KP(data *KP_instance,int number_of_items,int perc_cap,int category,int R,int shuffle,double conflict_density)
 /*********************************/
 {
 
@@ -262,6 +264,284 @@ void generate_instance_KP(data *KP_instance,int number_of_items,int perc_cap,int
 	cout << "\n-->item_number\t"<<KP_instance->item_number<<endl;
 	cout << "\n-->capacity\t"<<KP_instance->capacity<< "\tsum_weight\t" << sum_weight  << "\t%" << KP_instance->capacity/sum_weight <<endl;
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+	int n_conflicts=0;
+
+	KP_instance->CONF_MATRIX=new int*[KP_instance->item_number];
+	for ( int j = 0; j < KP_instance->item_number; j++ )
+	{
+		KP_instance->CONF_MATRIX[j]=new int[KP_instance->item_number];
+	}
+
+	for ( int j = 0; j < KP_instance->item_number; j++ )
+	{
+		for ( int i = 0; i < KP_instance->item_number; i++ )
+		{
+			KP_instance->CONF_MATRIX[j][i]=0;
+		}
+	}
+
+	for(int i=0; i<KP_instance->item_number; i++)
+	{
+
+		for(int j=i+1; j<KP_instance->item_number; j++)
+		{
+
+			double n_random=randomBETWEEN_double(0,1);
+
+			if(n_random<=conflict_density)
+			{
+
+				//					cout << "n_random\t" << n_random << endl;
+				//					cout << "conflict_density\t" << conflict_density << endl;
+				//					cout << "conflict\t" << i << "\t" << j << endl;
+
+				KP_instance->CONF_MATRIX[i][j]=1;
+				KP_instance->CONF_MATRIX[j][i]=1;
+
+				n_conflicts++;
+			}
+		}
+	}
+
+	////////////////////////////////////////////////////////////////////////////////////////////////////
+
+//	if(shuffle==2)
+//	{
+//		cout << "\n ***ORDER BY WEIGHT non-decreasing*** \n";
+//
+//		int *weights=new int[KP_instance->item_number];
+//		int *profits=new int[KP_instance->item_number];
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//			weights[jj]=KP_instance->weights[jj];
+//			profits[jj]=KP_instance->profits[jj];
+//		}
+//
+//		valuesSTR *values_all=new valuesSTR[KP_instance->item_number];
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//
+//			values_all[jj].item=jj;
+//			values_all[jj].score=KP_instance->weights[jj];
+//		}
+//
+//		qsort (values_all,KP_instance->item_number, sizeof(valuesSTR), compare);
+//
+////		for (int jj = 0; jj < KP_instance->item_number; jj++)
+////		{
+////			cout << "item\t" << values_all[jj].item << "\t" << values_all[jj].score << endl;
+////		}
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//			KP_instance->weights[jj]=weights[values_all[jj].item];
+//			KP_instance->profits[jj]=profits[values_all[jj].item];
+//		}
+//
+//
+//		////////////////////////////////////////////////////////////////////////////////////
+//		int **CONF_MATRIX_tmp=new int*[KP_instance->item_number];
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			CONF_MATRIX_tmp[j]=new int[KP_instance->item_number];
+//		}
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			for ( int i = 0; i < KP_instance->item_number; i++ )
+//			{
+//
+//				CONF_MATRIX_tmp[j][i]=KP_instance->CONF_MATRIX[j][i];
+//
+//				KP_instance->CONF_MATRIX[j][i]=0;
+//			}
+//		}
+//
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			for ( int i = 0; i < KP_instance->item_number; i++ )
+//			{
+//				if(CONF_MATRIX_tmp[values_all[j].item][values_all[i].item]==1)
+//				{
+//					KP_instance->CONF_MATRIX[j][i]=1;
+//				}
+//			}
+//		}
+//
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			delete []CONF_MATRIX_tmp[j];
+//		}
+//		delete []CONF_MATRIX_tmp;
+//		////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//		delete []values_all;
+//
+//		delete []weights;
+//		delete []profits;
+//
+//
+//	}
+//
+//
+//	if(shuffle==3)
+//	{
+//		cout << "\n ***ORDER BY WEIGHT non-increasing*** \n";
+//
+//		int *weights=new int[KP_instance->item_number];
+//		int *profits=new int[KP_instance->item_number];
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//			weights[jj]=KP_instance->weights[jj];
+//			profits[jj]=KP_instance->profits[jj];
+//		}
+//
+//		valuesSTR *values_all=new valuesSTR[KP_instance->item_number];
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//
+//			values_all[jj].item=jj;
+//			values_all[jj].score=1.0/KP_instance->weights[jj];
+//		}
+//
+//		qsort (values_all,KP_instance->item_number, sizeof(valuesSTR), compare);
+//
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//			KP_instance->weights[jj]=weights[values_all[jj].item];
+//			KP_instance->profits[jj]=profits[values_all[jj].item];
+//		}
+//
+//
+//		////////////////////////////////////////////////////////////////////////////////////
+//		int **CONF_MATRIX_tmp=new int*[KP_instance->item_number];
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			CONF_MATRIX_tmp[j]=new int[KP_instance->item_number];
+//		}
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			for ( int i = 0; i < KP_instance->item_number; i++ )
+//			{
+//				CONF_MATRIX_tmp[j][i]=KP_instance->CONF_MATRIX[j][i];
+//				KP_instance->CONF_MATRIX[j][i]=0;
+//			}
+//		}
+//
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			for ( int i = 0; i < KP_instance->item_number; i++ )
+//			{
+//				if(CONF_MATRIX_tmp[values_all[j].item][values_all[i].item]==1)
+//				{
+//					KP_instance->CONF_MATRIX[j][i]=1;
+//				}
+//			}
+//		}
+//
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			delete []CONF_MATRIX_tmp[j];
+//		}
+//		delete []CONF_MATRIX_tmp;
+//		////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//		delete []values_all;
+//
+//		delete []weights;
+//		delete []profits;
+//	}
+//
+//	if(shuffle==4)
+//	{
+//		cout << "\n ***ORDER BY RATIO profit over weight*** \n";
+//
+//		int *weights=new int[KP_instance->item_number];
+//		int *profits=new int[KP_instance->item_number];
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//			weights[jj]=KP_instance->weights[jj];
+//			profits[jj]=KP_instance->profits[jj];
+//		}
+//
+//		valuesSTR *values_all=new valuesSTR[KP_instance->item_number];
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//
+//			values_all[jj].item=jj;
+//			values_all[jj].score=KP_instance->weights[jj]/KP_instance->profits[jj];
+//		}
+//
+//		qsort (values_all,KP_instance->item_number, sizeof(valuesSTR), compare);
+//
+//
+//		for (int jj = 0; jj < KP_instance->item_number; jj++)
+//		{
+//			KP_instance->weights[jj]=weights[values_all[jj].item];
+//			KP_instance->profits[jj]=profits[values_all[jj].item];
+//		}
+//
+//
+//		////////////////////////////////////////////////////////////////////////////////////
+//		int **CONF_MATRIX_tmp=new int*[KP_instance->item_number];
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			CONF_MATRIX_tmp[j]=new int[KP_instance->item_number];
+//		}
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			for ( int i = 0; i < KP_instance->item_number; i++ )
+//			{
+//				CONF_MATRIX_tmp[j][i]=KP_instance->CONF_MATRIX[j][i];
+//				KP_instance->CONF_MATRIX[j][i]=0;
+//			}
+//		}
+//
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			for ( int i = 0; i < KP_instance->item_number; i++ )
+//			{
+//				if(CONF_MATRIX_tmp[values_all[j].item][values_all[i].item]==1)
+//				{
+//					KP_instance->CONF_MATRIX[j][i]=1;
+//				}
+//			}
+//		}
+//
+//
+//		for ( int j = 0; j < KP_instance->item_number; j++ )
+//		{
+//			delete []CONF_MATRIX_tmp[j];
+//		}
+//		delete []CONF_MATRIX_tmp;
+//		////////////////////////////////////////////////////////////////////////////////////
+//
+//
+//
+//		delete []values_all;
+//
+//		delete []weights;
+//		delete []profits;
+//
+//	}
 
 
 #ifdef print_ist_features
@@ -279,12 +559,27 @@ void generate_instance_KP(data *KP_instance,int number_of_items,int perc_cap,int
 	}
 	cout << "\n";
 
+#ifdef	print_ist_features_CONFLICTS
+	cout << "CONFLICTS\n\n";
+	for ( int j = 0; j < KP_instance->item_number; j++ )
+	{
+		for ( int i = 0; i < KP_instance->item_number; i++ )
+		{
+			cout << KP_instance->CONF_MATRIX[j][i] << " ";
+		}
+		cout << "\n";
+	}
+	cout << "\n";
+#endif
 
 #endif
 
 
 	cout << "Instance read!\n";
 	///////////////////////////////////////////////////////////
+
+
+	return n_conflicts;
 
 }
 
@@ -293,15 +588,22 @@ void free_data_prob(data *KP_instance)
 /*********************************/
 {
 
+	for ( int j = 0; j < KP_instance->item_number; j++ )
+	{
+		delete []KP_instance->CONF_MATRIX[j];
+	}
+	delete []KP_instance->CONF_MATRIX;
+
 	free(KP_instance->weights);
 	free(KP_instance->profits);
 }
 
 
 /***********************************************************************************/
-void kp_load_cplex(data *KP_instance)
+void  kp_load_cplex(data *KP_instance)
 /***********************************************************************************/
 {
+
 
 	int i,j;
 
@@ -406,15 +708,66 @@ void kp_load_cplex(data *KP_instance)
 	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 
-	//	/////////////////////////////////////////////////////////////////////////////////////////////////////////
-	//	// * writing the created ILP model on a file *
-	//	KP_instance->status=CPXwriteprob(KP_instance->env,KP_instance->lp,"kp.lp",NULL);
-	//	if(KP_instance->status!=0) {
-	//		printf("error in CPXwriteprob\n");
-	//		exit(-1);
-	//	}
-	//	/////////////////////////////////////////////////////////////////////////////////////////////////////////
 
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+	for(i=0; i<KP_instance->item_number; i++)
+	{
+		for(j=i+1; j<KP_instance->item_number; j++)
+		{
+			if(KP_instance->CONF_MATRIX[i][j]==1)
+			{
+
+				//cout << "item conflict\t" << i << "\t" << j << endl;
+
+				KP_instance->rcnt=1;
+				KP_instance->nzcnt=2;
+				KP_instance->rhs=(double*) calloc(KP_instance->rcnt,sizeof(double));
+				KP_instance->sense=(char*) calloc(KP_instance->rcnt,sizeof(double));
+
+				KP_instance->rhs[0]=1.0;
+				KP_instance->sense[0]='L';
+
+
+				KP_instance->rmatbeg=(int*) calloc(KP_instance->rcnt,sizeof(int));
+				KP_instance->rmatind=(int*) calloc(KP_instance->nzcnt,sizeof(int));
+				KP_instance->rmatval=(double*) calloc(KP_instance->nzcnt,sizeof(double));
+
+				KP_instance->rmatval[0]=1.0;
+				KP_instance->rmatind[0]=i;
+
+				KP_instance->rmatval[1]=1.0;
+				KP_instance->rmatind[1]=j;
+
+				KP_instance->rmatbeg[0]=0;
+
+				KP_instance->status=CPXaddrows(KP_instance->env,KP_instance->lp,0,KP_instance->rcnt,KP_instance->nzcnt,KP_instance->rhs,KP_instance->sense,KP_instance->rmatbeg,KP_instance->rmatind,KP_instance->rmatval,NULL,NULL);
+				if(KP_instance->status!=0)
+				{
+					printf("error in CPXaddrows\n");
+					exit(-1);
+				}
+
+				free(KP_instance->rmatbeg);
+				free(KP_instance->rmatval);
+				free(KP_instance->rmatind);
+				free(KP_instance->rhs);
+				free(KP_instance->sense);
+
+			}
+		}
+	}
+	////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+//		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//		// * writing the created ILP model on a file *
+//		KP_instance->status=CPXwriteprob(KP_instance->env,KP_instance->lp,"kp.lp",NULL);
+//		if(KP_instance->status!=0) {
+//			printf("error in CPXwriteprob\n");
+//			exit(-1);
+//		}
+//		/////////////////////////////////////////////////////////////////////////////////////////////////////////
+//
 
 
 
@@ -546,12 +899,12 @@ double kp_solve_cplex(data *KP_instance)
 	printf("\n\nMIP solution value ->\t\%f",KP_instance->objval);
 
 
-	//	printf("\n\nSolution\n");
-	//	for (i = 0; i < KP_instance->item_number; i++)
-	//	{
-	//		printf("item %d -> %d\n",i+1 ,(int)(KP_instance->x[i]+0.5));
-	//	}
-	//	printf("\n\n");
+//	printf("\n\nSolution\n");
+//	for (i = 0; i < KP_instance->item_number; i++)
+//	{
+//		printf("item %d -> %d p %f w % d\n",i ,(int)(KP_instance->xx[i]+0.5), KP_instance->profits[i], KP_instance->weights[i]);
+//	}
+//	printf("\n\n");
 
 	KP_instance->status=CPXgetbestobjval(KP_instance->env,KP_instance->lp,&(KP_instance->bestobjval));
 	if(KP_instance->status!=0)
@@ -563,6 +916,8 @@ double kp_solve_cplex(data *KP_instance)
 	KP_instance->lpstat=CPXgetstat(KP_instance->env,KP_instance->lp);
 	KP_instance->nodecount = CPXgetnodecnt(KP_instance->env, KP_instance->lp);
 
+
+	cout << "\nlpstat\t" << KP_instance->lpstat << endl;
 
 	///////////////////////////////////////////////////////////////////////////////////
 	/* linear programming relaxation*/
@@ -687,7 +1042,7 @@ double kp_solve_cplex_LP(data *KP_instance,double *point)
 		exit(-1);
 	}
 
-	printf("\n\nLP solution value ->\t\%f",cplex_lp);
+	printf("\n\nLP solution value ->\t\%f\n",cplex_lp);
 
 	KP_instance->status=CPXgetx(KP_instance->env,KP_instance->lp,point,0,KP_instance->item_number-1);
 	if(KP_instance->status!=0)
@@ -696,13 +1051,13 @@ double kp_solve_cplex_LP(data *KP_instance,double *point)
 		exit(-1);
 	}
 
-	//		printf("\n\nSolution\n");
-	//		for (i = 0; i < KP_instance->item_number; i++)
-	//		{
-	//			printf("item %d -> %.3f (p/w %.3f)\n",i+1,point[i],KP_instance->profits[i]/KP_instance->weights[i]);
-	//		}
-	//		printf("\n");
-	//		cin.get();
+//			printf("\n\nSolution\n");
+//			for (i = 0; i < KP_instance->item_number; i++)
+//			{
+//				printf("item %d -> %.3f (p/w %.3f)\n",i+1,point[i],KP_instance->profits[i]/KP_instance->weights[i]);
+//			}
+//			printf("\n");
+//			cin.get();
 
 	///////////////////////////////////////////////////////////////////////////////////
 
@@ -755,6 +1110,73 @@ void add_cover(data *KP_instance,double *cover)
 	}
 
 	KP_instance->rhs[0]=counter-1;
+
+
+	KP_instance->rmatbeg[0]=0;
+
+	KP_instance->status=CPXaddrows(KP_instance->env,KP_instance->lp,0,KP_instance->rcnt,KP_instance->nzcnt,KP_instance->rhs,KP_instance->sense,KP_instance->rmatbeg,KP_instance->rmatind,KP_instance->rmatval,NULL,NULL);
+	if(KP_instance->status!=0)
+	{
+		printf("error in CPXaddrows\n");
+		exit(-1);
+	}
+
+	free(KP_instance->rmatbeg);
+	free(KP_instance->rmatval);
+	free(KP_instance->rmatind);
+	free(KP_instance->rhs);
+	free(KP_instance->sense);
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+
+	//	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	//	// * writing the created ILP model on a file *
+	//	KP_instance->status=CPXwriteprob(KP_instance->env,KP_instance->lp,"sep_cover.lp",NULL);
+	//	if(KP_instance->status!=0) {
+	//		printf("error in CPXwriteprob\n");
+	//		exit(-1);
+	//	}
+	//	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+}
+
+
+/***********************************************************************************/
+void add_cover_extended(data *KP_instance,double *cover, double RHS)
+/***********************************************************************************/
+{
+
+	int i,j;
+
+	/////////////////////////////////////////////////////////////////////////////////////////////////////////
+	// * creating the knapsack constraint *
+	KP_instance->rcnt=1;
+	KP_instance->nzcnt=KP_instance->item_number;
+	KP_instance->rhs=(double*) calloc(KP_instance->rcnt,sizeof(double));
+	KP_instance->sense=(char*) calloc(KP_instance->rcnt,sizeof(double));
+
+	KP_instance->sense[0]='L';
+
+
+	KP_instance->rmatbeg=(int*) calloc(KP_instance->rcnt,sizeof(int));
+	KP_instance->rmatind=(int*) calloc(KP_instance->nzcnt,sizeof(int));
+	KP_instance->rmatval=(double*) calloc(KP_instance->nzcnt,sizeof(double));
+
+	int counter=0;
+	for(i=0; i<KP_instance->item_number; i++)
+	{
+		if(cover[i]>0.5)
+		{
+			KP_instance->rmatval[i]=1.0;
+			counter++;
+		}
+		else{
+			KP_instance->rmatval[i]=0.0;
+		}
+		KP_instance->rmatind[i]=i;
+	}
+
+	KP_instance->rhs[0]=RHS-1;
 
 
 	KP_instance->rmatbeg[0]=0;

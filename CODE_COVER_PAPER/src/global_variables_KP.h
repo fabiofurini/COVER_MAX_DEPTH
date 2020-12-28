@@ -45,24 +45,12 @@ typedef struct data
 	CPXENVptr env;
 	CPXLPptr  lp;
 
-//	CPXENVptr env_sep,env_sep_bis;
-//	CPXLPptr  lp_sep,lp_sep_bis;
-//	double *profit_sep;
-//	//double *cover;
-//	double objval_cover;
-//	int cap_sep;
-//	//int *x_int;
+	///////////////////////////////////////////////////////////////////////////////
+	//conflicts of the KP instance
+	int n_conflicts;
+	int **CONF_MATRIX;//1 if there is a conflict and 0 otherwise
+	///////////////////////////////////////////////////////////////////////////////
 
-
-
-	//double *sol_DP;
-	//vector < int > order_DP;
-
-
-//	long int * magic_sum;
-//	double *profit_sep_magic;
-
-//	int number_of_covers;
 
 } data;
 

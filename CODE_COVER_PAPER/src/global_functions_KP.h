@@ -21,6 +21,9 @@
 #include "global_variables_KP.h"
 #include "DP.h"
 
+
+
+
 /*****************************************************************/
 int randomBETWEEN(int min,int max);
 /*****************************************************************/
@@ -34,7 +37,7 @@ double random01();
 /*****************************************************************/
 
 /***********************************************************************************/
-void generate_instance_KP(data *KP_instance,int number_of_items,int perc_cap,int category,int R);
+int generate_instance_KP(data *KP_instance,int number_of_items,int perc_cap,int category,int R,int shuffle,double conflict_density);
 /***********************************************************************************/
 
 /***********************************************************************************/
@@ -65,5 +68,8 @@ double kp_solve_cplex_LP(data *KP_instance,double *point);
 void add_cover(data *KP_instance,double *cover);
 /***********************************************************************************/
 
+/***********************************************************************************/
+void add_cover_extended(data *KP_instance,double *cover, double RHS);
+/***********************************************************************************/
 
 #endif
