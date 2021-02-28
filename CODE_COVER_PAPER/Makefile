@@ -6,7 +6,7 @@ CXX= g++
 
 # FILES
 
-OBJS =	src/Main.o src/global_functions_KP.o src/global_functions_COVER.o src/DP.o 
+OBJS =	src/Main.o  src/global_functions_MULTI_KP.o  src/DP.o src/global_functions_COVERs.o
 
 
 # CPLEX VERSION (LIBS and INCLUDE files)
@@ -48,15 +48,14 @@ CXXFLAGS =  $(DBG) $(INCDIR)
 
 LDLIBS = $(LP_LIBS)
 
-all:COVER
+all:MULTI
 
-COVER: $(OBJS)
+MULTI: $(OBJS)
 		$(CXX) $(CXXFLAGS) -o $@ $(OBJS) $(LDLIBS) 
 
 $(OBJS): Makefile
 
 clean:
-	rm -f $(OBJS) rm COVER
+	rm -f $(OBJS) rm MULTI
 
 	
-
